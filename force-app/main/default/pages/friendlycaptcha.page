@@ -1,0 +1,39 @@
+<apex:page showHeader="false" controller="CaptchaWidgetController">
+    <html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/friendly-challenge@0.9.12/widget.module.min.js"></script>   
+        <script src="https://cdn.jsdelivr.net/npm/friendly-challenge@0.9.12/widget.min.js"></script>       
+        <script>
+            function myCallback(solution) {
+                console.log("Captcha finished with solution " + solution);
+                localStorage.setItem("globalsolution", solution);                           
+            }
+       </script>
+    </head>
+    <body>
+        <h1> hello, Friendly captcha test !!</h1>
+        <form id="formElem">
+            <div class="frc-captcha" data-sitekey="FCMJHORIVTP1G6TB" data-callback="myCallback" data-start="none" data-lang="en"></div>
+            <input type="submit" />          
+        </form>       
+        <script>
+            formElem.onsubmit = async (e) => {                
+                e.preventDefault();   
+                var solution = localStorage.getItem("globalsolution");
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.CaptchaWidgetController.verifySolution}',
+                    solution,
+                    (result, event) => {
+                        if (event.status) {
+                		// window.parent.postMessage(result, communityOrigin);
+ 			               console.log(event.status);
+                        }
+                    },
+                    { escape: true }
+                );   
+        }
+                
+      </script>
+    </body>
+</html>
+</apex:page>
